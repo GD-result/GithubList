@@ -34,7 +34,7 @@ class getList:
         if (r.status_code == requests.codes.OK):
             return json.loads(r.content)
         else:
-            print r.headers
+            print "Error ",r.headers
             return None
     
     def request(self, content, name_page, wiki_token, wiki_server):
@@ -68,22 +68,31 @@ class getList:
     def main(self):
         list_url = "https://api.github.com/orgs/%s/repos" % org_name
         repos = self.get_list(list_url)
-        content = ""
-        print repos
-        for i,repo in enumerate(repos):
-            list_url = "https://api.github.com/repos/%s/%s/teams" % (org_name, repo['name'])
+        if repos == None:
+            print "gavgav repo"
+            return
+        content = "{html}<head><style>td b{ color: #003366 } .header { background-color: #F0F0F0 }</style></head><body><table border='1' cellpadding = '3'>"
+        #print repos
+        for repo in enumerate(repos):
+            list_url = "https://api.github.com/repos/%s/%s/teams" % (org_name, repo[1]['name'])
             teams = self.get_list(list_url)
-            content += "h1.%s \n" % repo['name']
-            for j,team in enumerate(teams):
-                content += "|| %s |" % team['name']
-                list_url = "https://api.github.com/teams/%s/members" % team['id']
+            if teams == None:
+                print "gavgav team"
+                return
+            content += "<tr><td rowspan='%d' class = 'header'><b>%s</b></td>" % (len(teams),repo[1]['name'])
+            for team in enumerate(teams):
+                content += "<td><b>%s</b></td><td>" % team[1]['name']
+                list_url = "https://api.github.com/teams/%s/members" % team[1]['id']
                 users = self.get_list(list_url)
+                if users == None:
+                    print "gavgav user"
+                    return
                 if users != []:
-                    for k,user in enumerate(users):
-                        content += user['login'] + ", "
+                    for user in enumerate(users):
+                        content += user[1]['login'] + ", "
                     content = content[:-2]
-                content += " |\n"
-            content += "\n"
+                content += "&nbsp</td></tr>"
+        content += "</table></body>{html}"
         self.request(content, page_name, self.wiki_token, self.wiki_server)
         
 getList = getList()
