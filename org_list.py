@@ -52,7 +52,6 @@ class getList:
                 page = wiki_server.confluence1.getPage(wiki_token, SPACE, name_page)
             except:
                 parent = wiki_server.confluence1.getPage(wiki_token, SPACE, TOP_PAGE)
-                #table_headers = "h1. News Feed (UTC) \n ||id||Date||Author||Event Type||\n"
                 page = {
                       'parentId': parent['id'],
                       'space': SPACE,
@@ -71,17 +70,16 @@ class getList:
         if repos == None:
             print "gavgav repo"
             return
-        content = "{html}<head><style>td b{ color: #003366 } .header { background-color: #F0F0F0 }</style></head><body><table border='1' cellpadding = '3'>"
-        #print repos
+        content = "{html}<head></head><body><table border='1' cellpadding = '3'>"
         for repo in enumerate(repos):
             list_url = "https://api.github.com/repos/%s/%s/teams" % (org_name, repo[1]['name'])
             teams = self.get_list(list_url)
             if teams == None:
                 print "gavgav team"
                 return
-            content += "<tr><td rowspan='%d' class = 'header'><b>%s</b></td>" % (len(teams),repo[1]['name'])
+            content += "<tr><td rowspan='%d' class = 'header' bgcolor = #F0F0F0><b style = 'color: #003366;'>%s</b></td>" % (len(teams),repo[1]['name'])
             for team in enumerate(teams):
-                content += "<td><b>%s</b></td><td>" % team[1]['name']
+                content += "<td><b style = 'color: #003366;'>%s</b></td><td>" % team[1]['name']
                 list_url = "https://api.github.com/teams/%s/members" % team[1]['id']
                 users = self.get_list(list_url)
                 if users == None:
