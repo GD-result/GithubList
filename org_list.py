@@ -20,11 +20,11 @@ class getList:
         
     def get_list(self,list_url):
         """
-        get_list()
+        get_list(list_url)
         
-        This function get 
+        This function get the list of repositories/teams/users with chosen authorization type 
         """
-        #list_url = "https://api.github.com/orgs/%s/repos" % org_name
+        
         auth_type = ""
         if use_token:
             list_url += "?access_token=" + oauth_token
@@ -65,38 +65,54 @@ class getList:
                 
 
     def main(self):
-        list_url = "https://api.github.com/orgs/%s/repos" % org_name
+        host = "https://api.github.com/"
+        list_url = host + "orgs/%s/repos" % org_name
         repos = self.get_list(list_url)
         if repos == None:
-            print "gavgav repo"
+            print "Error. Failed to get the list of repositories"
             return
-        content = "h1. Github users list \n\
+        content = "h1. Github users list (by repositories) \n\
         {html}<div class='table-wrap'>\n<table class = 'confluenceTable'>\n\
         <tr><th class='confluenceTh'>Repositories</th>\
         <th class='confluenceTh'>Teams</th>\
         <th class='confluenceTh'>Users</th>\
         </tr>"
+        users_table = dict ()
         for repo in enumerate(repos):
-            list_url = "https://api.github.com/repos/%s/%s/teams" % (org_name, repo[1]['name'])
+            list_url = host + "repos/%s/%s/teams" % (org_name, repo[1]['name'])
             teams = self.get_list(list_url)
             if teams == None:
-                print "gavgav team"
+                print "Error. Failed to get the list of teams"
                 return
             content += "<tr><td rowspan='%d' class='confluenceTd'>%s</td>"\
              % (len(teams),repo[1]['name'])
             for team in enumerate(teams):
                 content += "<td class='confluenceTd'>%s</td>\
                 <td class='confluenceTd'>" % team[1]['name']
-                list_url = "https://api.github.com/teams/%s/members" % team[1]['id']
+                list_url = host + "teams/%s/members" % team[1]['id']
                 users = self.get_list(list_url)
                 if users == None:
-                    print "gavgav user"
+                    print "Error. Failed to get the list of users"
                     return
                 if users != []:
                     for user in enumerate(users):
                         content += user[1]['login'] + ", "
+                        row = "<td class='confluenceTd'>%s</td><td class='confluenceTd'>%s</td></tr>" % (repo[1]['name'],team[1]['name'])
+                        if users_table.has_key(user[1]['login']):
+                            users_table.update({user[1]['login']: (users_table.get(user[1]['login'])[0] + row, users_table.get(user[1]['login'])[1] + 1)})
+                        else:
+                            users_table.update({user[1]['login']: ("<tr>" + row, 2)})
                     content = content[:-2]
                 content += "&nbsp</td></tr>"
+        content += "</table></div>{html}\n \
+        h1. Github users list (by users)\n\
+        {html}<div class='table-wrap'>\n<table class = 'confluenceTable'>\n\
+        <tr><th class='confluenceTh'>Users</th>\
+        <th class='confluenceTh'>Repositories</th>\
+        <th class='confluenceTh'>Teams</th>\
+        </tr>"
+        for key, value in sorted(users_table.items()):
+            content += "<tr><td rowspan = '%s' class='confluenceTd'>" % (value[1]) + key + "</td>" + value[0] + "</tr>"
         content += "</table></div>{html}"
         self.request(content, page_name, self.wiki_token, self.wiki_server)
         
