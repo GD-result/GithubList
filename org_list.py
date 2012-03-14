@@ -70,16 +70,23 @@ class getList:
         if repos == None:
             print "gavgav repo"
             return
-        content = "{html}<head></head><body><table border='1' cellpadding = '3'>"
+        content = "h1. Github users list \n\
+        {html}<div class='table-wrap'>\n<table class = 'confluenceTable'>\n\
+        <tr><th class='confluenceTh'>Repositories</th>\
+        <th class='confluenceTh'>Teams</th>\
+        <th class='confluenceTh'>Users</th>\
+        </tr>"
         for repo in enumerate(repos):
             list_url = "https://api.github.com/repos/%s/%s/teams" % (org_name, repo[1]['name'])
             teams = self.get_list(list_url)
             if teams == None:
                 print "gavgav team"
                 return
-            content += "<tr><td rowspan='%d' class = 'header' bgcolor = #F0F0F0><b style = 'color: #003366;'>%s</b></td>" % (len(teams),repo[1]['name'])
+            content += "<tr><td rowspan='%d' class='confluenceTd'>%s</td>"\
+             % (len(teams),repo[1]['name'])
             for team in enumerate(teams):
-                content += "<td><b style = 'color: #003366;'>%s</b></td><td>" % team[1]['name']
+                content += "<td class='confluenceTd'>%s</td>\
+                <td class='confluenceTd'>" % team[1]['name']
                 list_url = "https://api.github.com/teams/%s/members" % team[1]['id']
                 users = self.get_list(list_url)
                 if users == None:
@@ -90,7 +97,7 @@ class getList:
                         content += user[1]['login'] + ", "
                     content = content[:-2]
                 content += "&nbsp</td></tr>"
-        content += "</table></body>{html}"
+        content += "</table></div>{html}"
         self.request(content, page_name, self.wiki_token, self.wiki_server)
         
 getList = getList()
