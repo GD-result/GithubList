@@ -99,9 +99,9 @@ class getList:
                         content += user[1]['login'] + ", "
                         row = "<td class='confluenceTd'>%s</td><td class='confluenceTd'>%s</td></tr>" % (repo[1]['name'],team[1]['name'])
                         if users_table.has_key(user[1]['login']):
-                            users_table.update({user[1]['login']: (users_table.get(user[1]['login'])[0] + row, users_table.get(user[1]['login'])[1] + 1)})
+                            users_table.update({user[1]['login']: (users_table.get(user[1]['login'])[0] + "<tr>" + row, users_table.get(user[1]['login'])[1] + 1)})
                         else:
-                            users_table.update({user[1]['login']: ("<tr>" + row, 2)})
+                            users_table.update({user[1]['login']: (row, 1)})
                     content = content[:-2]
                 content += "&nbsp</td></tr>"
         content += "</table></div>{html}\n \
@@ -112,7 +112,8 @@ class getList:
         <th class='confluenceTh'>Teams</th>\
         </tr>"
         for key, value in sorted(users_table.items()):
-            content += "<tr><td rowspan = '%s' class='confluenceTd'>" % (value[1]) + key + "</td>" + value[0] + "</tr>"
+            content += "<tr><td rowspan = '%s' class='confluenceTd'>" % (value[1]) + key + "</td>" + value[0]# + "</tr>"
+            #print key, value[1]
         content += "</table></div>{html}"
         self.request(content, page_name, self.wiki_token, self.wiki_server)
         
