@@ -87,7 +87,7 @@ class getList:
             content += "<tr><td rowspan='%d' class='confluenceTd'>%s</td>"\
              % (len(teams),repo[1]['name'])
             for team in enumerate(teams):
-                content += "<td class='confluenceTd'>%s</td>\
+                content += "<td class='confluenceTd'>%s&nbsp</td>\
                 <td class='confluenceTd'>" % team[1]['name']
                 list_url = host + "teams/%s/members" % team[1]['id']
                 users = self.get_list(list_url)
@@ -97,7 +97,10 @@ class getList:
                 if users != []:
                     for user in enumerate(users):
                         content += user[1]['login'] + ", "
-                        row = "<td class='confluenceTd'>%s</td><td class='confluenceTd'>%s</td></tr>" % (repo[1]['name'],team[1]['name'])
+                        if repo[1]['private']:
+                            row = "<td class='confluenceTd'><b>%s</b></td><td class='confluenceTd'>%s</td></tr>" % (repo[1]['name'],team[1]['name'])
+                        else: 
+                            row = "<td class='confluenceTd'>%s</td><td class='confluenceTd'>%s</td></tr>" % (repo[1]['name'],team[1]['name'])
                         if users_table.has_key(user[1]['login']):
                             users_table.update({user[1]['login']: (users_table.get(user[1]['login'])[0] + "<tr>" + row, users_table.get(user[1]['login'])[1] + 1)})
                         else:
@@ -112,8 +115,7 @@ class getList:
         <th class='confluenceTh'>Teams</th>\
         </tr>"
         for key, value in sorted(users_table.items()):
-            content += "<tr><td rowspan = '%s' class='confluenceTd'>" % (value[1]) + key + "</td>" + value[0]# + "</tr>"
-            #print key, value[1]
+            content += "<tr><td rowspan = '%s' class='confluenceTd'>" % (value[1]) + key + "</td>" + value[0]
         content += "</table></div>{html}"
         self.request(content, page_name, self.wiki_token, self.wiki_server)
         
