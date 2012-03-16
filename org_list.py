@@ -34,7 +34,7 @@ class getList:
         if (r.status_code == requests.codes.OK):
             return json.loads(r.content)
         else:
-            print "Error ",r.headers
+            print "Error ",r.headers, r.status_code
             return None
     
     def request(self, content, name_page, wiki_token, wiki_server):
@@ -82,31 +82,34 @@ class getList:
             list_url = host + "repos/%s/%s/teams" % (org_name, repo[1]['name'])
             teams = self.get_list(list_url)
             if teams == None:
-                print "Error. Failed to get the list of teams"
+                print "Error. Failed to get the list of teams ", repo[1]['name']
                 return
-            content += "<tr><td rowspan='%d' class='confluenceTd'>%s</td>"\
-             % (len(teams),repo[1]['name'])
-            for team in enumerate(teams):
-                content += "<td class='confluenceTd'>%s&nbsp</td>\
-                <td class='confluenceTd'>" % team[1]['name']
-                list_url = host + "teams/%s/members" % team[1]['id']
-                users = self.get_list(list_url)
-                if users == None:
-                    print "Error. Failed to get the list of users"
-                    return
-                if users != []:
-                    for user in enumerate(users):
-                        content += user[1]['login'] + ", "
-                        if repo[1]['private']:
-                            row = "<td class='confluenceTd'><b>%s</b></td><td class='confluenceTd'>%s</td></tr>" % (repo[1]['name'],team[1]['name'])
-                        else: 
-                            row = "<td class='confluenceTd'>%s</td><td class='confluenceTd'>%s</td></tr>" % (repo[1]['name'],team[1]['name'])
-                        if users_table.has_key(user[1]['login']):
-                            users_table.update({user[1]['login']: (users_table.get(user[1]['login'])[0] + "<tr>" + row, users_table.get(user[1]['login'])[1] + 1)})
-                        else:
-                            users_table.update({user[1]['login']: (row, 1)})
-                    content = content[:-2]
-                content += "&nbsp</td></tr>"
+            if teams == []:
+                content += "<tr><td class='confluenceTd'>%s<td class='confluenceTd'>&nbsp</td><td class='confluenceTd'>&nbsp</td></tr>" % (repo[1]['name'])
+            else:
+                content += "<tr><td rowspan='%d' class='confluenceTd'>%s</td>"\
+                 % (len(teams),repo[1]['name'])
+                for team in enumerate(teams):
+                    content += "<td class='confluenceTd'>%s&nbsp</td>\
+                    <td class='confluenceTd'>" % team[1]['name']
+                    list_url = host + "teams/%s/members" % team[1]['id']
+                    users = self.get_list(list_url)
+                    if users == None:
+                        print "Error. Failed to get the list of users ", team[1]['name']
+                        return
+                    if users != []:
+                        for user in enumerate(users):
+                            content += user[1]['login'] + ", "
+                            if repo[1]['private']:
+                                row = "<td class='confluenceTd'><b>%s</b></td><td class='confluenceTd'>%s</td></tr>" % (repo[1]['name'],team[1]['name'])
+                            else: 
+                                row = "<td class='confluenceTd'>%s</td><td class='confluenceTd'>%s</td></tr>" % (repo[1]['name'],team[1]['name'])
+                            if users_table.has_key(user[1]['login']):
+                                users_table.update({user[1]['login']: (users_table.get(user[1]['login'])[0] + "<tr>" + row, users_table.get(user[1]['login'])[1] + 1)})
+                            else:
+                                users_table.update({user[1]['login']: (row, 1)})
+                        content = content[:-2]
+                    content += "&nbsp</td></tr>"
         content += "</table></div>{html}\n \
         h1. Github users list (by users)\n\
         {html}<div class='table-wrap'>\n<table class = 'confluenceTable'>\n\
