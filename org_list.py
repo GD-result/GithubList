@@ -31,7 +31,7 @@ class getList:
         else:
             auth_type = (github_login, github_pass)
         r = requests.get(url = list_url, auth = auth_type)
-        if (r.status_code == requests.codes.OK):
+        if (r.status_code == requests.codes.OK and r.headers['x-ratelimit-remaining'] > 0):
             return json.loads(r.content)
         else:
             print "Error ", r.status_code, r.headers
