@@ -34,7 +34,7 @@ class getList:
         if (r.status_code == requests.codes.OK):
             return json.loads(r.content)
         else:
-            print "Error ",r.headers, r.status_code
+            print "Error ", r.status_code, r.headers
             return None
     
     def request(self, content, name_page, wiki_token, wiki_server):
@@ -85,7 +85,7 @@ class getList:
                 print "Error. Failed to get the list of teams ", repo[1]['name']
                 return
             if teams == []:
-                content += "<tr><td class='confluenceTd'>%s<td class='confluenceTd'>&nbsp</td><td class='confluenceTd'>&nbsp</td></tr>" % (repo[1]['name'])
+                content += "<tr><td class='confluenceTd'>%s</td><td class='confluenceTd'>&nbsp</td><td class='confluenceTd'>&nbsp</td></tr>" % (repo[1]['name'])
             else:
                 content += "<tr><td rowspan='%d' class='confluenceTd'>%s</td>"\
                  % (len(teams),repo[1]['name'])
