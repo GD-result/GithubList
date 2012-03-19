@@ -1,2 +1,20 @@
 List users in your organization and send it to wiki
-Simple version
+
+Needs conf.py file which contains variables:
+
+	TOP_PAGE - Top page on wiki. String
+	SPACE - Space on wiki. String
+	WIKI_USER - Your wiki username. String
+	WIKI_PASS - Your wiki password. String
+	wiki_url - Wiki url. String
+	page_name - Name of page. String
+	org_name - Organization name on github. String
+	github_login - Your github login. String
+	github_pass - Your github password. String
+	oauth_token - Your github oAuth token (scope: repo). String
+	use_token - Authorization type. Boolean (True if you use oAuth token, False if you use login/password)
+	permission_color = {
+         'pull' : 'inherit',
+         'push' : 'green',
+         'admin' : 'red'
+         }

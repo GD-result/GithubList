@@ -13,6 +13,7 @@ from conf import use_token
 from conf import oauth_token
 from conf import github_login
 from conf import github_pass
+from conf import permission_color
 
 class getList:
     wiki_server = xmlrpclib.ServerProxy(wiki_url)
@@ -71,7 +72,12 @@ class getList:
         if repos == None:
             print "Error. Failed to get the list of repositories"
             return
-        content = "h1. Github users list (by repositories) \n\
+        content = "*Repository* - private repository \n \
+        Repository - public repository\n\
+        Team - team with pull only access\n\
+        {color:red}Team{color} - team with push & pull access\n\
+        {color:green}Team{color} - team with pull, push & administrative access\n\n\
+        h1. Github users list (by repositories) \n\
         {html}<div class='table-wrap'>\n<table class = 'confluenceTable'>\n\
         <tr><th class='confluenceTh'>Repositories</th>\
         <th class='confluenceTh'>Teams</th>\
@@ -84,14 +90,16 @@ class getList:
             if teams == None:
                 print "Error. Failed to get the list of teams ", repo[1]['name']
                 return
+            font = "bold" if repo[1]['private'] else "normal"
             if teams == []:
-                content += "<tr><td class='confluenceTd'>%s</td><td class='confluenceTd'>&nbsp</td><td class='confluenceTd'>&nbsp</td></tr>" % (repo[1]['name'])
+                content += "<tr><td class='confluenceTd' style='font-weight: %s'>%s</td><td class='confluenceTd'>&nbsp</td><td class='confluenceTd'>&nbsp</td></tr>" % (font,repo[1]['name'])
             else:
-                content += "<tr><td rowspan='%d' class='confluenceTd'>%s</td>"\
-                 % (len(teams),repo[1]['name'])
+                content += "<tr><td rowspan='%d' class='confluenceTd' style='font-weight: %s'>%s</td>" % (len(teams),font,repo[1]['name'])
                 for team in enumerate(teams):
-                    content += "<td class='confluenceTd'>%s&nbsp</td>\
-                    <td class='confluenceTd'>" % team[1]['name']
+                    list_url = host + "teams/%s" % team[1]['id']
+                    permission = self.get_list(list_url)['permission']
+                    content += "<td class='confluenceTd' style = 'color : %s'>%s&nbsp</td>\
+                    <td class='confluenceTd'>" % (permission_color[permission],team[1]['name'])
                     list_url = host + "teams/%s/members" % team[1]['id']
                     users = self.get_list(list_url)
                     if users == None:
@@ -100,10 +108,7 @@ class getList:
                     if users != []:
                         for user in enumerate(users):
                             content += user[1]['login'] + ", "
-                            if repo[1]['private']:
-                                row = "<td class='confluenceTd'><b>%s</b></td><td class='confluenceTd'>%s</td></tr>" % (repo[1]['name'],team[1]['name'])
-                            else: 
-                                row = "<td class='confluenceTd'>%s</td><td class='confluenceTd'>%s</td></tr>" % (repo[1]['name'],team[1]['name'])
+                            row = "<td class='confluenceTd' style='font-weight: %s'>%s</td><td class='confluenceTd' style = 'color : %s'>%s</td></tr>" % (font,repo[1]['name'],permission_color[permission],team[1]['name'])
                             if users_table.has_key(user[1]['login']):
                                 users_table.update({user[1]['login']: (users_table.get(user[1]['login'])[0] + "<tr>" + row, users_table.get(user[1]['login'])[1] + 1)})
                             else:
