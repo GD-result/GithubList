@@ -75,8 +75,8 @@ class getList:
         content = "*Repository* - private repository \n \
         Repository - public repository\n\
         Team - team with pull only access\n\
-        {color:red}Team{color} - team with push & pull access\n\
-        {color:green}Team{color} - team with pull, push & administrative access\n\n\
+        {color:green}Team{color} - team with push & pull access\n\
+        {color:red}Team{color} - team with pull, push & administrative access\n\n\
         h1. Github users list (by repositories) \n\
         {html}<div class='table-wrap'>\n<table class = 'confluenceTable'>\n\
         <tr><th class='confluenceTh'>Repositories</th>\
